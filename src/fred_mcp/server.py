@@ -22,9 +22,20 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
+def _get_lifespan_context(ctx: Context) -> dict:
+    """Get the lifespan context dict, compatible with fastmcp v2 and v3."""
+    # fastmcp v3: ctx.lifespan_context
+    # fastmcp v2: ctx.request_context.lifespan_context
+    lc = getattr(ctx, "lifespan_context", None)
+    if lc is None:
+        lc = ctx.request_context.lifespan_context
+    return lc
+
+
 def _get_client(ctx: Context) -> FredClient:
     """Extract FredClient from the lifespan context."""
-    client = ctx.lifespan_context.get("client")
+    lc = _get_lifespan_context(ctx)
+    client = lc.get("client") if isinstance(lc, dict) else getattr(lc, "client", None)
     if client is None:
         raise RuntimeError(
             "FRED client is not available. "

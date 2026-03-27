@@ -7,7 +7,7 @@ from typing import Any
 
 import httpx
 
-from .config import FredSettings
+from fred_mcp.config import FredSettings
 
 logger = logging.getLogger(__name__)
 

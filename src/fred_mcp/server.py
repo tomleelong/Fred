@@ -10,8 +10,8 @@ from contextlib import asynccontextmanager
 import httpx
 from fastmcp import Context, FastMCP
 
-from .client import FredClient
-from .config import FredSettings
+from fred_mcp.client import FredClient
+from fred_mcp.config import FredSettings
 
 # Configure logging to stderr (critical for stdio transport)
 logging.basicConfig(

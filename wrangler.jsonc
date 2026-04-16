@@ -1,0 +1,30 @@
+/**
+ * FRED MCP — Cloudflare Workers remote MCP server.
+ * Secrets (set via `wrangler secret put`):
+ *   - FRED_API_KEY
+ */
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "fred-mcp",
+	"account_id": "661f7644ad29f3357c0babc7fa76b326",
+	"main": "src/index.ts",
+	"compatibility_date": "2025-03-10",
+	"compatibility_flags": ["nodejs_compat"],
+	"migrations": [
+		{
+			"new_sqlite_classes": ["FredMCP"],
+			"tag": "v1"
+		}
+	],
+	"durable_objects": {
+		"bindings": [
+			{
+				"class_name": "FredMCP",
+				"name": "MCP_OBJECT"
+			}
+		]
+	},
+	"observability": {
+		"enabled": true
+	}
+}

@@ -1,4 +1,10 @@
-# Python
+# Node / Wrangler
+node_modules/
+.wrangler/
+.dev.vars
+worker-configuration.d.ts
+
+# Python (legacy/)
 __pycache__/
 *.py[cod]
 *$py.class

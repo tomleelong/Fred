@@ -1,6 +1,6 @@
 # FRED MCP Server
 
-A [FastMCP](https://gofastmcp.com) server that exposes [FRED](https://fred.stlouisfed.org/) (Federal Reserve Economic Data) API as MCP tools.
+A [Cloudflare Workers](https://developers.cloudflare.com/workers/) remote MCP server that exposes [FRED](https://fred.stlouisfed.org/) (Federal Reserve Economic Data) as MCP tools.
 
 ## Tools
 
@@ -14,58 +14,55 @@ A [FastMCP](https://gofastmcp.com) server that exposes [FRED](https://fred.stlou
 
 ## Setup
 
-### 1. Get a FRED API Key
+### 1. Get a FRED API key
 
-Register at [fredaccount.stlouisfed.org](https://fredaccount.stlouisfed.org) and request an API key.
+Register at [fredaccount.stlouisfed.org](https://fredaccount.stlouisfed.org) and request an API key (32-char alphanumeric).
 
 ### 2. Install
 
 ```bash
-uv sync
+npm install
 ```
 
-### 3. Configure
+### 3. Local development
+
+Create `.dev.vars` from the example and set your key:
 
 ```bash
-cp .env.example .env
-# Edit .env with your FRED_API_KEY
+cp .dev.vars.example .dev.vars
+# edit .dev.vars — FRED_API_KEY=your_key_here
+npm run dev
 ```
 
-### 4. Run locally
+The worker serves on `http://localhost:8787`:
+
+- `POST /mcp` — streamable HTTP MCP transport (preferred)
+- `GET  /sse` — legacy SSE transport
+
+Smoke-test with the MCP Inspector:
 
 ```bash
-uv run fred-mcp
+npx @modelcontextprotocol/inspector
+# Connect to http://localhost:8787/mcp
 ```
 
-## Usage with Claude Code
+## Deploy
 
-Add to your `.mcp.json`:
+```bash
+# Set the production secret (one-time)
+npx wrangler secret put FRED_API_KEY
 
-```json
-{
-  "mcpServers": {
-    "fred": {
-      "type": "stdio",
-      "command": "uv",
-      "args": ["run", "--directory", "/path/to/Fred", "fred-mcp"],
-      "env": {
-        "FRED_API_KEY": "your_key_here"
-      }
-    }
-  }
-}
+# Deploy
+npm run deploy
 ```
 
-## Deploy to Prefect Horizon
+Wrangler prints the production URL, e.g. `https://fred-mcp.<account>.workers.dev`.
 
-1. Push this repo to GitHub
-2. Go to [horizon.prefect.io](https://horizon.prefect.io)
-3. Connect your GitHub account
-4. Select this repository
-5. Set `FRED_API_KEY` as an environment variable
-6. Deploy — auto-redeploys on push to `main`
+## Connect from Claude.ai
 
-## Popular FRED Series
+Add a custom connector pointing at `https://fred-mcp.<account>.workers.dev/mcp`.
+
+## Popular FRED series
 
 - `GDP` — Gross Domestic Product
 - `UNRATE` — Unemployment Rate
@@ -74,7 +71,7 @@ Add to your `.mcp.json`:
 - `SP500` — S&P 500 Index
 - `T10Y2Y` — 10-Year minus 2-Year Treasury Spread
 
-## FRED API Reference
+## FRED API reference
 
 - [API Docs](https://fred.stlouisfed.org/docs/api/fred/)
 - Rate limit: 120 requests/minute
